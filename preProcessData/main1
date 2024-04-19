@@ -1,0 +1,273 @@
+# This is a sample Python script.
+
+# Press Umschalt+F10 to execute it or replace it with your code.
+# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+import csv
+import os
+import laspy as lp
+import pandas as pd
+import open3d as o3d
+from plyfile import PlyData, PlyElement
+import numpy as np
+import shutil
+
+def normalize_coordinates(df, point_cloud):
+    scale_x = point_cloud.header.scale[0]
+    offset_x = point_cloud.header.offset[0]
+    scale_y = point_cloud.header.scale[1]
+    offset_y = point_cloud.header.offset[1]
+    scale_z = point_cloud.header.scale[2]
+    offset_z = point_cloud.header.offset[2]
+    df['X'] = df['X'] * scale_x + offset_x
+    df['Y'] = df['Y'] * scale_y + offset_y
+    df['Z'] = df['Z'] * scale_z + offset_z
+    return df
+def normalize_colors(df):
+    color_min = 255
+    color_max = 65535
+    df['red'] = (df['red'] - color_min) / (color_max - color_min)
+    df['green'] = (df['green'] - color_min) / (color_max - color_min)
+    df['blue'] = (df['blue'] - color_min) / (color_max - color_min)
+    return df
+
+def visualizePointCloudLAZ(filepath):
+
+    las_file = filepath
+    point_cloud = lp.read(las_file)
+    # Create a new dictionary to hold our data
+    data = {}
+    for dimension in point_cloud.point_format.dimensions:
+        data[dimension.name] = getattr(point_cloud, dimension.name)
+    print(data)
+    print(len(data))
+    # Convert dictionary to pandas DataFrame
+    df = pd.DataFrame(data)
+    df = normalize_coordinates(df, point_cloud)
+    df = normalize_colors(df)
+
+    # Load PointCloud into PCD
+    pcd = o3d.geometry.PointCloud()
+    pcd.points = o3d.utility.Vector3dVector(df[['X', 'Y', 'Z']].values)
+    pcd.colors = o3d.utility.Vector3dVector(df[['red', 'green', 'blue']].values)
+    # show entire point cloud
+    o3d.visualization.draw_geometries([pcd])
+
+
+# Convert ply-files to txt-files
+def plyfilesToTextFiles():
+    print('path')
+    directory_path = '/home/christian/Schreibtisch/PointNetData/PlyFiles'
+    files = os.listdir(directory_path)
+    header = ['X', 'Y', 'Z', 'red', 'green', 'blue']
+
+    i = 0
+    for file_name in files:
+        # Counter for numberofFiles
+
+        file_path = os.path.join(directory_path, file_name)
+        plydata = PlyData.read(file_path)
+        cntDP = len(plydata.elements[0])
+        print(file_name[:-4])
+        # Write new txt-file
+
+        with open(os.path.join('/home/christian/Schreibtisch/PointNetData/txtCloudFiles', file_name[:-4] + '.txt' ), 'w') as file_txt:
+            for dpIndex in range(cntDP):
+                tupleValues = [str(value) for value in plydata.elements[0][dpIndex]]
+                file_txt.write(", ".join(tupleValues))
+                file_txt.write('\n')
+        i += 1
+
+
+    data = {}
+    header = ['X', 'Y', 'Z', 'red', 'green', 'blue']
+    for index, headerElement in enumerate(header):
+        data[headerElement] = np.zeros(cntDP)
+        tmpNPArray = np.zeros(len(plydata.elements[0]))
+        for dpIndex in range(cntDP):
+            data[headerElement][dpIndex] = plydata.elements[0][dpIndex][index]
+
+def visualizePointCloudPLY(filepath):
+
+    plydata = PlyData.read(filepath)
+
+    data = {}
+    cntDP = len(plydata.elements[0])
+    header = ['X', 'Y', 'Z', 'red', 'green', 'blue']
+    for index, headerElement in enumerate(header):
+        data[headerElement] = np.zeros(cntDP)
+        tmpNPArray = np.zeros(len(plydata.elements[0]))
+        for dpIndex in range(cntDP):
+            data[headerElement][dpIndex] = plydata.elements[0][dpIndex][index]
+
+
+    df = pd.DataFrame(data)
+
+    df = normalize_colors(df)
+    pcd = o3d.geometry.PointCloud()
+    pcd.points = o3d.utility.Vector3dVector(df[['X', 'Y', 'Z']].values)
+    pcd.colors = o3d.utility.Vector3dVector(df[['red', 'green', 'blue']].values)
+    # show entire point cloud
+    o3d.visualization.draw_geometries([pcd])
+
+
+def visualizePointCloudTXT(filepath):
+    plydata = PlyData.read(filepath)
+
+    data = {}
+    cntDP = len(plydata.elements[0])
+    header = ['X', 'Y', 'Z', 'red', 'green', 'blue']
+    for index, headerElement in enumerate(header):
+        data[headerElement] = np.zeros(cntDP)
+        tmpNPArray = np.zeros(len(plydata.elements[0]))
+        for dpIndex in range(cntDP):
+            data[headerElement][dpIndex] = plydata.elements[0][dpIndex][index]
+
+    df = pd.DataFrame(data)
+
+    df = normalize_colors(df)
+    pcd = o3d.geometry.PointCloud()
+    pcd.points = o3d.utility.Vector3dVector(df[['X', 'Y', 'Z']].values)
+    pcd.colors = o3d.utility.Vector3dVector(df[['red', 'green', 'blue']].values)
+    # show entire point cloud
+    o3d.visualization.draw_geometries([pcd])
+
+
+def categorizeFiles(csv_path, source_folder, destination_folder, withTxtEnding):
+    # Read the Excel file into a DataFrame
+    df = pd.read_csv(csv_path)
+
+    # Iterate through each row in the DataFrame
+    for index, row in df.iterrows():
+        file_name = row['building_id']
+        category = row['Gebäudetyp']
+
+
+        # Form the source and destination file paths
+        if withTxtEnding:
+            source_file_path = os.path.join(source_folder, f"{file_name}" + '.txt')
+        else:
+            source_file_path = os.path.join(source_folder, f"{file_name}")
+
+
+
+
+
+        # Check if the file exists before copying
+        if os.path.exists(source_file_path) and isinstance(category, str):
+            print(category)
+            destination_folder_path = os.path.join(destination_folder, category)
+            # Create the destination folder if it doesn't exist
+            os.makedirs(destination_folder_path, exist_ok=True)
+
+            # Copy the file to the destination folder
+            shutil.copy(source_file_path, destination_folder_path)
+        #else:
+            #print(f"File not found for category: {category} and file name: {file_name}")
+
+
+def changeTxtFilesNamesToStartWithCategory(directory_path):
+    for directory in os.listdir(directory_path):
+        for file in os.listdir(os.path.join(directory_path, directory)):
+            name = directory + file[4:]
+            print(file)
+            print(directory)
+            os.rename(os.path.join(directory_path + '/' + directory, file), os.path.join(directory_path + '/' + directory, f"{name}"))
+
+
+
+def get_matching_rows(csv_path, id_column, file_names):
+    # Read the CSV file into a DataFrame
+    df = pd.read_csv(csv_path)
+
+    # Filter rows based on the given file names
+    matching_rows = df[df[id_column].isin(file_names)]
+
+    return matching_rows
+
+def get_text_file_names(directory_path):
+    text_files = [file.split('.')[0] for file in os.listdir(directory_path)]
+    return text_files
+
+    # Example usage:
+def createFileWithAllTxtFileNames(directory_path, fromDirectory):
+    with open(os.path.join(directory_path, 'allTxtFileNames.txt'), 'w') as file_txt:
+        for directory in os.listdir(os.path.join(directory_path, fromDirectory)):
+
+            for file in os.listdir(os.path.join(os.path.join(directory_path, fromDirectory), directory)):
+                print(file)
+                file_txt.write(file + '\n')
+
+
+def find_files_with_less_than_X_lines(folderWithTxtDirects, lineLimit):
+    result_files = []
+
+    for folder in os.listdir(folderWithTxtDirects):
+        # Check if the folder exists
+
+        print(folder)
+        # Iterate through files in the folder
+        for filename in os.listdir(os.path.join(folderWithTxtDirects, folder)):
+            file_path = os.path.join(folderWithTxtDirects + '/' + folder, filename)
+
+            # Check if the path is a file and ends with '.txt'
+
+            if os.path.isfile(file_path):
+                print('test')
+                # Count the lines in the file
+                with open(file_path, 'r') as file:
+                    line_count = sum(1 for line in file)
+
+                # Check if the file has less than 1024 lines
+                if line_count < lineLimit:
+                    result_files.append(filename)
+
+    return result_files
+
+# Example usage:
+def addTxtEndingToFiles(directory_path):
+    for folder in os.listdir(directory_path):
+        for file in os.listdir(os.path.join(directory_path, folder)):
+            os.rename(os.path.join(directory_path + '/' + folder, file),
+                      os.path.join(directory_path + '/' + folder, file + '.txt'))
+            print('test')
+
+def deleteTextFilesFromDirectory(toDeleteArray, directoryToDeleteFrom):
+    for directory in os.listdir(directoryToDeleteFrom):
+       for file in os.listdir(os.path.join(directoryToDeleteFrom, directory)):
+           if file in toDeleteArray:
+               os.remove(os.path.join(directoryToDeleteFrom + '/' + directory, file))
+
+if __name__ == '__main__':
+    if False:
+        plyfilesToTextFiles()
+
+        csv_path = '/home/christian/Schreibtisch/PointNetData/Gebäudedatei_Stand_06072023_merged_IDs.csv'
+        id_column = 'building_id'  # Assuming 'ID' is the column in your CSV file that matches the txt file name
+        file_names_to_match = get_text_file_names('/home/christian/Schreibtisch/PointNetData/txtCloudFiles')  # Replace with the specific file names you want to match
+
+        # Get matching rows based on IDs
+        matching_rows = get_matching_rows(csv_path, id_column, file_names_to_match)
+
+        # Write the matching rows to a new CSV file
+
+        matching_rows.to_csv('/home/christian/Schreibtisch/PointNetData/FilteredCSVFilesForTXTFiles.csv', index=False)
+
+
+
+        filtered_csv_path = '/home/christian/Schreibtisch/PointNetData/FilteredCSVFilesForTXTFiles.csv'
+        categorizeFiles(filtered_csv_path, source_folder='/home/christian/Schreibtisch/PointNetData/txtCloudFiles', destination_folder='/home/christian/Schreibtisch/PointNetData/txtCloudFilesInTypes', withTxtEnding=False)
+        #visualizePointCloudLAZ('/home/christian/Downloads/filtered_6376_113815.laz')
+        #visualizePointCloudPLY('C:\\Users\\chris\\Desktop\\ScaDs Arbeit\\PlyFiles\\DESN_000CCJB.ply')
+        #visualizePointCloudTXT('C:\\Users\\chris\\Desktop\\ScaDs Arbeit\\PlyFiles\\DESN_000CCJB.ply')
+    elif False:
+        createFileWithAllTxtFileNames('/home/christian/Schreibtisch/PointNetData', fromDirectory = 'txtCloudFilesInTypes (Kopie) ohne txt Endung min 1024 Lines')
+    elif False:
+        changeTxtFilesNamesToStartWithCategory('/home/christian/Schreibtisch/PointNetData/txtCloudFilesInTypes')
+    elif False:
+        result = find_files_with_less_than_X_lines('/home/christian/Schreibtisch/PointNetData/txtCloudFilesInTypes (Kopie) ohne txt Endung', 1024)
+        print(result)
+        print(len(result))
+
+        deleteTextFilesFromDirectory(result, '/home/christian/Schreibtisch/PointNetData/txtCloudFilesInTypes (Kopie) ohne txt Endung min 1024 Lines')
+    elif True:
+        addTxtEndingToFiles('/home/christian/Schreibtisch/PointNetData/txtCloudFilesInTypes (Kopie) ohne txt Endung min 1024 Lines')
