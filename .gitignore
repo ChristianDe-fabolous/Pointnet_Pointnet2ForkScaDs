@@ -114,8 +114,9 @@ dmypy.json
 .pyre/
 
 
-data/ScaDSdata
+
 data/buildings_zentrum_nord
 data/modelnet40_normal_resampled
 .conda
 log
+rawData
