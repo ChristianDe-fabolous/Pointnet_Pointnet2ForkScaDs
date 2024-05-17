@@ -116,7 +116,7 @@ def main(args):
 
     '''DATA LOADING'''
     log_string('Load dataset ...')
-    data_path = 'data/ScaDSdata/'
+    data_path = 'data/ScaDSdata/buildings_zentrum_nord_txt_categorized'
 
     train_dataset = ScaDSDataLoader(root=data_path, args=args, split='train', process_data=args.process_data)
     test_dataset = ScaDSDataLoader(root=data_path, args=args, split='test', process_data=args.process_data)

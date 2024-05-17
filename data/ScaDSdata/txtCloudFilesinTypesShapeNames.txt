@@ -1,5 +1,0 @@
-131 - Einfamilien – Einzelhaus
-134 - Mehrfamilien – Einzelhaus
-135 - Mehrfamilien – Reihenhaus
-142 - Bürohaus
-143 - Sonstiges
