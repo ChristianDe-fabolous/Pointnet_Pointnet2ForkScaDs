@@ -57,8 +57,8 @@ class ScaDSDataLoader(Dataset):
 
 
         self.catfile = os.path.join(self.root, 'txtCloudFilesinTypesShapeNames.txt')
-
         print(self.catfile)
+        print(self.root)
         self.cat = [line.rstrip() for line in open(self.catfile)]
         self.classes = dict(zip(self.cat, range(len(self.cat))))
 
@@ -66,6 +66,7 @@ class ScaDSDataLoader(Dataset):
 
         shape_ids['train'] = [line.rstrip() for line in open(os.path.join(self.root, 'allTxtFileNames.txt'))]
         shape_ids['test'] = [line.rstrip() for line in open(os.path.join(self.root, 'allTxtFileNames.txt'))]
+    
 
         assert (split == 'train' or split == 'test')
         shape_names = ['_'.join(x.split('_')[0:-1]) for x in shape_ids[split]]
