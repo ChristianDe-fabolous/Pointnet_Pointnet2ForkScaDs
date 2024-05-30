@@ -10,6 +10,8 @@ import numpy as np
 
 import datetime
 import logging
+
+import torch.cuda
 import provider
 import importlib
 import shutil
@@ -58,6 +60,9 @@ def test(model, loader, num_class=40):
 
         if not args.use_cpu:
             points, target = points.cuda(), target.cuda()
+            print(torch.cuda.is_available())
+            print(torch.cuda.device_count())
+            print(torch.cuda.current_device())
 
         points = points.transpose(2, 1)
         pred, _ = classifier(points)
