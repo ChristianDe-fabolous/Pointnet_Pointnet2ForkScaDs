@@ -196,8 +196,11 @@ def main(args):
 
 
             #if not args.use_cpu: not activated bc. cuda can"t be used
-            if False:
+            if not args.use_cpu:
                 points, target = points.cuda(), target.cuda()
+                print(torch.cuda.is_available())
+                print(torch.cuda.device_count())
+                print(torch.cuda.current_device())
 
             pred, trans_feat = classifier(points)
             loss = criterion(pred, target.long(), trans_feat)
