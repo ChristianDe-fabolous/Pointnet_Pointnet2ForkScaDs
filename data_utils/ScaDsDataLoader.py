@@ -10,7 +10,6 @@ import pickle
 
 from tqdm import tqdm
 from torch.utils.data import Dataset
-
 warnings.filterwarnings('ignore')
 
 
@@ -23,6 +22,7 @@ def pc_normalize(pc):
 
 
 def farthest_point_sample(point, npoint):
+    fpsCounter = 0
     """
     Input:
         xyz: pointcloud data, [N, D]
@@ -119,10 +119,16 @@ class ScaDSDataLoader(Dataset):
             point_set = np.loadtxt(fn[1], delimiter=',').astype(np.float32)
 
             if self.uniform:
+                #by Christian
+                #print('fps-Counter')
                 point_set = farthest_point_sample(point_set, self.npoints)
             else:
                 point_set = point_set[0:self.npoints, :]
-                
+
+        #by Christian
+        #print(len(point_set))
+        
+
         point_set[:, 0:3] = pc_normalize(point_set[:, 0:3])
         if not self.use_normals:
             point_set = point_set[:, 0:3]

@@ -127,8 +127,8 @@ def main(args):
     train_dataset = ScaDSDataLoader(root=data_path, args=args, split='train', process_data=args.process_data)
     test_dataset = ScaDSDataLoader(root=data_path, args=args, split='test', process_data=args.process_data)
     print("train_dataset@", train_dataset)
-    trainDataLoader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=False, num_workers=10, drop_last=True)
-    testDataLoader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=10)
+    trainDataLoader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=10, drop_last=True)
+    testDataLoader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=True, num_workers=10)
 
     #for value in trainDataLoader:
         #print(value)
@@ -189,6 +189,13 @@ def main(args):
             optimizer.zero_grad()
 
             points = points.data.numpy()
+            #by Christian
+            print('points in training: ' + str(len(points)) + '   len in points: ' + str(len(points[0])))
+            print('pointsshape: ' + str(points.shape))
+            print('target: ' + str(target.shape))
+            print(target)
+            #write_FPS_PointCloud_in_File(points)
+
             points = provider.random_point_dropout(points)
             points[:, :, 0:3] = provider.random_scale_point_cloud(points[:, :, 0:3])
             points[:, :, 0:3] = provider.shift_point_cloud(points[:, :, 0:3])
@@ -247,3 +254,7 @@ def main(args):
 if __name__ == '__main__':
     args = parse_args()
     main(args)
+
+
+def write_FPS_PointCloud_in_File(points):
+    pass
