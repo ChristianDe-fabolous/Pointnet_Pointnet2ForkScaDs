@@ -42,6 +42,7 @@ def parse_args():
     parser.add_argument('--use_normals', action='store_true', default=False, help='use normals')
     parser.add_argument('--process_data', action='store_true', default=False, help='save data offline')
     parser.add_argument('--use_uniform_sample', action='store_true', default=False, help='use uniform sampiling')
+    parser.add_argument('--directory', required=True, help='directory, where data is located')
     return parser.parse_args()
 
 
@@ -121,7 +122,7 @@ def main(args):
 
     '''DATA LOADING'''
     log_string('Load dataset ...')
-    data_path = 'data/ScaDSdata/buildings_zentrum_nord_txt_categorized'
+    data_path = 'data/' + args.directory #+ '/buildings_zentrum_nord_txt_categorized'
 
     train_dataset = ScaDSDataLoader(root=data_path, args=args, split='train', process_data=args.process_data)
     test_dataset = ScaDSDataLoader(root=data_path, args=args, split='test', process_data=args.process_data)
@@ -195,7 +196,6 @@ def main(args):
             points = points.transpose(2, 1)
 
 
-            #if not args.use_cpu: not activated bc. cuda can"t be used
             if not args.use_cpu:
                 points, target = points.cuda(), target.cuda()
                 print(torch.cuda.is_available())
