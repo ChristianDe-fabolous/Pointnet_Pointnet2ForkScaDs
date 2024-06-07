@@ -350,12 +350,14 @@ def useStreetSmart(filename, csvpath):
     csvPd = pd.read_csv(csvpath)
     
 def createTestTxtFile():
-        
+    pass
+
+def deleteNotListedFiles():
+    pass
 
 def main():
     print('t')
 
-def categorizFilesWithFi
 
 
 if __name__ == '__main__':

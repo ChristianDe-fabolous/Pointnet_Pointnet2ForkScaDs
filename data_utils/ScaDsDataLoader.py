@@ -64,8 +64,8 @@ class ScaDSDataLoader(Dataset):
 
         shape_ids = {}
 
-        shape_ids['train'] = [line.rstrip() for line in open(os.path.join(self.root, 'allTxtFileNames.txt'))]
-        shape_ids['test'] = [line.rstrip() for line in open(os.path.join(self.root, 'allTxtFileNames.txt'))]
+        shape_ids['train'] = [line.rstrip() for line in open(os.path.join(self.root, 'dataTrain.txt'))]
+        shape_ids['test'] = [line.rstrip() for line in open(os.path.join(self.root, 'dataTest.txt'))]
     
 
         assert (split == 'train' or split == 'test')
