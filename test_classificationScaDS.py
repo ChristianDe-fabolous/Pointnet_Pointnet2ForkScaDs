@@ -89,7 +89,7 @@ def main(args):
 
     '''DATA LOADING'''
     log_string('Load dataset ...')
-    data_path = 'data/ScaDSdata/'
+    data_path = 'data/' + args.directory #+ '/buildings_zentrum_nord_txt_categorized'
 
     test_dataset = ScaDSDataLoader(root=data_path, args=args, split='test', process_data=False)
     testDataLoader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=True, num_workers=10)
