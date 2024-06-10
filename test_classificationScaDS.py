@@ -20,10 +20,10 @@ sys.path.append(os.path.join(ROOT_DIR, 'models'))
 def parse_args():
     '''PARAMETERS'''
     parser = argparse.ArgumentParser('Testing')
-    parser.add_argument('--use_cpu', action='store_true', default=True, help='use cpu mode')
+    parser.add_argument('--use_cpu', action='store_true', default=False, help='use cpu mode')
     parser.add_argument('--gpu', type=str, default='0', help='specify gpu device')
-    parser.add_argument('--batch_size', type=int, default=24, help='batch size in training')
-    parser.add_argument('--num_category', default=5, type=int,  help='training on ModelNet10/40')
+    parser.add_argument('--batch_size', type=int, default=10, help='batch size in training')
+    parser.add_argument('--num_category', default=5, type=int,  help='training on different Categories')
     parser.add_argument('--num_point', type=int, default=1024, help='Point Number')
     parser.add_argument('--log_dir', type=str, required=True, help='Experiment root')
     parser.add_argument('--use_normals', action='store_true', default=False, help='use normals')
@@ -91,7 +91,7 @@ def main(args):
     data_path = 'data/ScaDSdata/'
 
     test_dataset = ScaDSDataLoader(root=data_path, args=args, split='test', process_data=False)
-    testDataLoader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=10)
+    testDataLoader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=True, num_workers=10)
 
     '''MODEL LOADING'''
     num_class = args.num_category
