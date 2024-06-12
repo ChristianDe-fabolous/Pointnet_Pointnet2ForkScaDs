@@ -1,3 +1,9 @@
+import laspy as lp
+import open3d as o3d
+import pandas as pd
+
+
+
 def visualizePlyFile(filepath):
     def normalize_coordinates(df, point_cloud):
         scale_x = point_cloud.header.scale[0]
@@ -61,3 +67,7 @@ def visualizeFile(filepath):
         visualizePlyFile(filepath)
     elif filepath.endswith('.laz'):
         visualizeLazFile(filepath)
+
+
+if __name__ == '__main__':
+    visualizeFile('/home/christian/Desktop/ScaDS/PointNet2YanxFork/Pointnet_Pointnet2ForkScaDs/rawData/lidar_buildings_zentrum_nord_ply/buildings_zentrum_nord/DESN_000TTCM.ply')

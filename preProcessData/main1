@@ -376,9 +376,11 @@ def writeAdressinTxtFile(csv_file, id_file, goal_file):
         
         for row in reader:
             id_csv = row['building_id'] 
-            strasse = row["Straße"] + "0" + str(int(row["PLZ"][:-2])) 
-
-            address_data[id_csv] = address + row["HNr"] + "0" + str(int(row["PLZ"][:-2]))
+            if (row['PLZ'] is not ''):
+                address = row['Straße'] + " " + row['HNr'] + ", 0" + str(int(row['PLZ'][:-2])) 
+            else: 
+                address = row['Straße'] + " " + row['HNr'] + ", keinePostleitzahl" 
+            address_data[id_csv] = address
 
     # Step 3: Merge the data
     merged_data = []
@@ -396,6 +398,11 @@ def writeAdressinTxtFile(csv_file, id_file, goal_file):
     print("Merged data has been written to 'merged_data.txt'")
 
 
+def randomizeTrainAndTestData(source_file, dataTest_file, dataTrain_file):
+    with open(source_file, 'r') as sf:
+        lines = [line for line in sf]
+        for line in lines:
+            print(line)
 
 if __name__ == '__main__':
 
@@ -405,6 +412,7 @@ if __name__ == '__main__':
         plyfilesToTextFiles(
             root + 'data/ScaDSdata/buildings_zentrum_nord', root + 'data/ScaDSdata/buildings_zetrum_nord_raw_txt')
     elif True:
+        randomizeTrainAndTestData('/home/christian/Desktop/ScaDS/PointNet2YanxFork/Pointnet_Pointnet2ForkScaDs/data/ScaDSdataBinaryClassification/allTxtFileNames.txt', 'a', 'b')
         writeAdressinTxtFile('/home/christian/Desktop/ScaDS/PointNet2YanxFork/Pointnet_Pointnet2ForkScaDs/PlyCloudData/Gebäudedatei_Stand_06072023_merged_IDs.csv', '/home/christian/Desktop/ScaDS/PointNet2YanxFork/Pointnet_Pointnet2ForkScaDs/data/fileLists/allTxtFileNamesLess1024', '/home/christian/Desktop/ScaDS/PointNet2YanxFork/Pointnet_Pointnet2ForkScaDs/data/txtFilesWithAdressLess1024')
     elif False:
 
