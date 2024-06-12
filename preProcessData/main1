@@ -359,6 +359,43 @@ def main():
     print('t')
 
 
+def writeAdressinTxtFile(csv_file, id_file, goal_file):
+
+    # Step 1: Read the first file into a dictionary
+    id_file_data = {}
+    with open(id_file, 'r') as f:
+        for line in f:
+            id, number = line.strip().split(', ')
+            id = id[:-4]
+            id_file_data[id] = number
+
+    # Step 2: Read the CSV file containing the addresses
+    address_data = {}
+    with open(csv_file, 'r') as f:
+        reader = csv.DictReader(f)
+        
+        for row in reader:
+            id_csv = row['building_id'] 
+            strasse = row["Straße"] + "0" + str(int(row["PLZ"][:-2])) 
+
+            address_data[id_csv] = address + row["HNr"] + "0" + str(int(row["PLZ"][:-2]))
+
+    # Step 3: Merge the data
+    merged_data = []
+    for id, number in id_file_data.items():
+        if id in address_data:
+            address = address_data[id]
+            merged_data.append([id, address, number])
+
+    # Step 4: Write the combined data to a new file
+    with open(goal_file, 'w') as f:
+        for data in merged_data:
+            print(data)
+            f.write(', '.join(data) + '\n')
+
+    print("Merged data has been written to 'merged_data.txt'")
+
+
 
 if __name__ == '__main__':
 
@@ -367,6 +404,8 @@ if __name__ == '__main__':
     if False:
         plyfilesToTextFiles(
             root + 'data/ScaDSdata/buildings_zentrum_nord', root + 'data/ScaDSdata/buildings_zetrum_nord_raw_txt')
+    elif True:
+        writeAdressinTxtFile('/home/christian/Desktop/ScaDS/PointNet2YanxFork/Pointnet_Pointnet2ForkScaDs/PlyCloudData/Gebäudedatei_Stand_06072023_merged_IDs.csv', '/home/christian/Desktop/ScaDS/PointNet2YanxFork/Pointnet_Pointnet2ForkScaDs/data/fileLists/allTxtFileNamesLess1024', '/home/christian/Desktop/ScaDS/PointNet2YanxFork/Pointnet_Pointnet2ForkScaDs/data/txtFilesWithAdressLess1024')
     elif False:
 
         file_names_to_match = get_text_file_names(
