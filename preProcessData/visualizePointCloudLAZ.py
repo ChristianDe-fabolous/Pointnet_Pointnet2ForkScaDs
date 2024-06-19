@@ -1,3 +1,14 @@
+
+import csv
+import os
+import laspy as lp
+import pandas as pd
+import open3d as o3d
+from plyfile import PlyData, PlyElement
+import numpy as np
+import shutil
+import argparse
+
 def normalize_coordinates(df, point_cloud):
     scale_x = point_cloud.header.scale[0]
     offset_x = point_cloud.header.offset[0]
@@ -17,8 +28,8 @@ def normalize_colors(df):
     df['blue'] = (df['blue'] - color_min) / (color_max - color_min)
     return df
 
-def visualizePointCloudLAZ(filepath):
-
+def visualizePointCloudLAZ():
+    filepath = '/home/christian/Desktop/rawDataScaDs/Nord/de-zent-230322_part_00_01/filtered_6342_113839.laz' 
     las_file = filepath
     point_cloud = lp.read(las_file)
     # Create a new dictionary to hold our data
@@ -38,3 +49,8 @@ def visualizePointCloudLAZ(filepath):
     pcd.colors = o3d.utility.Vector3dVector(df[['red', 'green', 'blue']].values)
     # show entire point cloud
     o3d.visualization.draw_geometries([pcd])
+
+
+
+if __name__ == '__main__':
+    visualizePointCloudLAZ()

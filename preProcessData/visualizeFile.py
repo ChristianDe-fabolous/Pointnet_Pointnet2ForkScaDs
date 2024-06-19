@@ -27,24 +27,8 @@ def visualizePlyFile(filepath):
         return df
 
 
-    las_file = filepath
-    point_cloud = lp.read(las_file)
-    # Create a new dictionary to hold our data
-    data = {}
-    for dimension in point_cloud.point_format.dimensions:
-        data[dimension.name] = getattr(point_cloud, dimension.name)
-    print(data)
-    print(len(data))
-    # Convert dictionary to pandas DataFrame
-    df = pd.DataFrame(data)
-    df = normalize_coordinates(df, point_cloud)
-    df = normalize_colors(df)
-
-    # Load PointCloud into PCD
-    pcd = o3d.geometry.PointCloud()
-    pcd.points = o3d.utility.Vector3dVector(df[['X', 'Y', 'Z']].values)
-    pcd.colors = o3d.utility.Vector3dVector(
-        df[['red', 'green', 'blue']].values)
+    pcd = o3d.io.read_point_cloud(filepath)
+    print(pcd)
     # show entire point cloud
     o3d.visualization.draw_geometries([pcd])
 
@@ -70,4 +54,4 @@ def visualizeFile(filepath):
 
 
 if __name__ == '__main__':
-    visualizeFile('/home/christian/Desktop/ScaDS/PointNet2YanxFork/Pointnet_Pointnet2ForkScaDs/rawData/lidar_buildings_zentrum_nord_ply/buildings_zentrum_nord/DESN_000TTCM.ply')
+    visualizeFile('/home/christian/Desktop/rawDataScaDs/buildings_zentrum_nord/DESN_000ZXDB.ply')

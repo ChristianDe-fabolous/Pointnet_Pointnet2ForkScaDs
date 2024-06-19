@@ -43,8 +43,9 @@ def test(model, loader, num_class=40, vote_num=1):
             points, target = points.cuda(), target.cuda()
 
         points = points.transpose(2, 1)
-        vote_pool = torch.zeros(target.size()[0], num_class).cuda()
-
+        #vote_pool = torch.zeros(target.size()[0], num_class).cuda()
+        vote_pool = torch.zeros(target.size()[0], num_class)
+       
         for _ in range(vote_num):
             pred, _ = classifier(points)
             vote_pool += pred
